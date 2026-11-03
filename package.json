@@ -1,0 +1,63 @@
+{
+  "name": "booking-barber",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun scripts/dev.ts",
+    "build": "bun run --cwd apps/web build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "bun test tests/unit",
+    "test:integration": "bun test --timeout 30000 tests/integration",
+    "test:e2e": "playwright test",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "bun scripts/migrate.ts",
+    "db:seed": "bun scripts/seed.ts",
+    "admin:create": "bun scripts/create-admin.ts",
+    "db:setup": "bun scripts/setup-db.ts",
+    "db:start": "powershell -NoProfile -File scripts/postgres.ps1 -Action start",
+    "db:stop": "powershell -NoProfile -File scripts/postgres.ps1 -Action stop",
+    "admin:reset": "bun scripts/reset-admin.ts",
+    "admin:dev": "bun scripts/create-dev-admin.ts",
+    "db:backup": "powershell -NoProfile -File scripts/backup.ps1",
+    "start": "bun scripts/dev.ts --production",
+    "format:check": "prettier --check apps packages/db/src scripts tests *.ts *.json *.mjs README.md"
+  },
+  "dependencies": {
+    "@elysiajs/eden": "1.4.9",
+    "@tanstack/react-form": "1.33.5",
+    "@tanstack/react-query": "5.105.3",
+    "@tanstack/react-table": "8.21.3",
+    "better-auth": "1.7.15",
+    "drizzle-orm": "0.45.4",
+    "elysia": "1.4.30",
+    "lucide-react": "1.66.0",
+    "next": "15.5.28",
+    "pg": "8.23.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "@barber/db": "workspace:*",
+    "@barber/api": "workspace:*"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@next/eslint-plugin-next": "15.5.28",
+    "@playwright/test": "1.64.1",
+    "@tailwindcss/postcss": "4.3.4",
+    "@types/bun": "1.4.4",
+    "@types/node": "22.20.5",
+    "@types/pg": "8.23.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "drizzle-kit": "0.31.11",
+    "eslint": "9.39.5",
+    "prettier": "3.9.10",
+    "tailwindcss": "4.3.4",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.72.1"
+  }
+}

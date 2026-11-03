@@ -1,0 +1,11 @@
+node_modules
+.next*
+**/.next*
+.local
+packages/db/migrations
+bun.lock
+skills-lock.json
+.agents
+playwright-report
+test-results
+backups

@@ -1,0 +1,11 @@
+{
+  "name": "@barber/api",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/app.ts"
+  },
+  "scripts": {
+    "dev": "bun --watch src/index.ts"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "project": {
+    "name": "booking-barber",
+    "productType": "Single-shop Thai appointment booking",
+    "stack": [
+      "nextjs",
+      "react",
+      "tailwind-v4"
+    ]
+  },
+  "sources": {
+    "tokens": [],
+    "components": [],
+    "assets": [],
+    "instructions": []
+  },
+  "design": {
+    "colorMode": "light",
+    "colors": {},
+    "typography": {},
+    "spacing": {},
+    "radius": {},
+    "shadows": {},
+    "motion": {},
+    "density": "comfortable"
+  },
+  "components": {
+    "installed": [],
+    "preferredPrimitives": [],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [],
+    "avoid": []
+  },
+  "decisions": [
+    {
+      "id": "thai-light-booking-v1",
+      "decision": "Thai-first, mobile-first booking interface with warm paper backgrounds, restrained terracotta accents, readable controls, and a five-step customer flow.",
+      "source": "User-approved implementation plan"
+    },
+    {
+      "id": "local-primitives",
+      "decision": "Reuse local Button, Modal, Field patterns, receipt and slot picker across customer/admin screens. Catalog retrieval was unavailable (HTTP 401); no 21st component code was imported.",
+      "source": "21st search and implementation verification"
+    }
+  ],
+  "evidence": [
+    {
+      "fact": "project.stack:nextjs",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:react",
+      "source": "package.json"
+    },
+    {
+      "fact": "project.stack:tailwind-v4",
+      "source": "package.json"
+    }
+  ],
+  "generatedAt": "2026-11-03T05:31:40.109Z"
+}
