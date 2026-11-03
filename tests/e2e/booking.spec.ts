@@ -80,15 +80,16 @@ test('owner manages services, staff, shop settings and offline bookings', async 
   await page.getByRole('dialog').getByRole('button', { name: 'ปิดหน้าต่าง' }).click();
   await page.getByLabel('เริ่มวันที่').fill(day(info.project.name === 'mobile' ? 8 : 7));
   await expect(
-    page.locator('.booking-card').filter({ hasText: `หน้าร้าน ${info.project.name}` }),
+    page.locator('.booking-card:visible').filter({ hasText: `หน้าร้าน ${info.project.name}` }),
   ).toBeVisible();
   await page.getByRole('button', { name: 'รายสัปดาห์', exact: true }).click();
   await expect(page.locator('.calendar-column')).toHaveCount(7);
-  await page.getByRole('button', { name: 'รายการ', exact: true }).click();
+  await page.getByRole('button', { name: 'รายการ 30 วัน', exact: true }).click();
   await expect(page.getByRole('table')).toBeVisible();
   await page.getByRole('button', { name: 'บริการ', exact: true }).click();
   await page.getByRole('button', { name: '+ เพิ่มบริการ', exact: true }).click();
   const service = page.getByRole('dialog');
+  await expect(service).toHaveAccessibleName('เพิ่มบริการ');
   await service.getByLabel('ชื่อบริการ').fill(`จัดแต่งทรง ${info.project.name}`);
   await service.getByLabel('ราคา (บาท)').fill('80');
   await service.getByLabel('ระยะเวลา (นาที)').fill('15');
@@ -96,9 +97,11 @@ test('owner manages services, staff, shop settings and offline bookings', async 
   await expect(
     page.locator('.management-row').filter({ hasText: `จัดแต่งทรง ${info.project.name}` }),
   ).toBeVisible();
+  await expect(page.locator('.workspace-feedback')).toHaveText('บันทึกบริการแล้ว');
   await page.getByRole('button', { name: 'ช่างและตารางงาน', exact: true }).click();
   await page.getByRole('button', { name: '+ เพิ่มช่าง', exact: true }).click();
   const staff = page.getByRole('dialog');
+  await expect(staff).toHaveAccessibleName('เพิ่มช่าง');
   await staff.getByLabel('ชื่อช่าง', { exact: true }).fill(`ช่างใหม่ ${info.project.name}`);
   await staff.getByLabel('แนะนำตัว').fill('ช่างทดสอบตารางงาน');
   await staff.getByLabel('ตัดผม', { exact: true }).check();
@@ -106,13 +109,13 @@ test('owner manages services, staff, shop settings and offline bookings', async 
   await expect(
     page.locator('.staff-card').filter({ hasText: `ช่างใหม่ ${info.project.name}` }),
   ).toBeVisible();
+  await expect(page.locator('.workspace-feedback')).toHaveText('บันทึกข้อมูลช่างและตารางงานแล้ว');
   await page.getByRole('button', { name: 'ตั้งค่าร้าน', exact: true }).click();
   await page.getByRole('textbox', { name: 'ที่อยู่', exact: true }).fill('ร้านทดสอบ กรุงเทพมหานคร');
   await page.getByRole('button', { name: 'บันทึกการตั้งค่า' }).click();
   await expect(page.getByText('บันทึกการตั้งค่าแล้ว', { exact: true })).toBeVisible();
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'ตารางนัดหมาย', exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'ตั้งค่าร้าน', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'ตั้งค่าร้าน', exact: true })).toBeVisible();
   await expect(page.getByRole('textbox', { name: 'ที่อยู่', exact: true })).toHaveValue(
     'ร้านทดสอบ กรุงเทพมหานคร',
   );
@@ -141,7 +144,7 @@ test('responsive pages fit the viewport and render without browser errors', asyn
   });
   await login(page);
   await page.getByLabel('เริ่มวันที่').fill(day(info.project.name === 'mobile' ? 8 : 7));
-  await expect(page.locator('.booking-card').first()).toBeVisible();
+  await expect(page.locator('.booking-card:visible').first()).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
@@ -149,5 +152,90 @@ test('responsive pages fit the viewport and render without browser errors', asyn
     path: resolve(`.local/previews/admin-${info.project.name}.png`),
     fullPage: true,
   });
+  if (info.project.name === 'mobile') {
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const first = await page.locator('.booking-card:visible').first().boundingBox();
+    expect(first!.y).toBeLessThan(550);
+    for (const width of [320, 390, 760]) {
+      await page.setViewportSize({ width, height: 844 });
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+      ).toBe(true);
+      expect(
+        await page.locator('.admin-tabs').evaluate((el) => el.scrollWidth <= el.clientWidth),
+      ).toBe(true);
+      await expect(page.getByRole('button', { name: 'ตั้งค่าร้าน', exact: true })).toBeInViewport();
+      await page.screenshot({
+        path: resolve(`.local/previews/admin-${width}.png`),
+        fullPage: true,
+      });
+    }
+  }
   expect(errors).toEqual([]);
+});
+
+test('dashboard preserves working context and shows service-specific availability', async ({
+  page,
+}, info) => {
+  await login(page);
+  const date = day(info.project.name === 'mobile' ? 8 : 7);
+  await page.getByLabel('เริ่มวันที่').fill(date);
+  await page.getByRole('button', { name: 'รายสัปดาห์', exact: true }).click();
+  const filters = page.getByRole('button', { name: /ค้นหาและสถานะ/ });
+  if (await filters.isVisible()) await filters.click();
+  await page.getByLabel('ค้นหานัด', { exact: true }).fill('หน้าร้าน');
+  await page.getByLabel('กรองสถานะ', { exact: true }).selectOption('confirmed');
+  await page.getByLabel('กรองช่าง', { exact: true }).selectOption({ label: 'ช่างต้น' });
+  const selectedStaff = await page.getByLabel('กรองช่าง', { exact: true }).inputValue();
+  await page.getByRole('button', { name: 'บริการ', exact: true }).click();
+  await page.getByRole('button', { name: 'นัดหมาย', exact: true }).click();
+  await page.reload();
+  await expect(page.getByLabel('เริ่มวันที่')).toHaveValue(date);
+  await expect(page.getByRole('button', { name: 'รายสัปดาห์', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(page.getByLabel('ค้นหานัด', { exact: true })).toHaveValue('หน้าร้าน');
+  await expect(page.getByLabel('กรองสถานะ', { exact: true })).toHaveValue('confirmed');
+  await expect(page.getByLabel('กรองช่าง', { exact: true })).toHaveValue(selectedStaff);
+  await page.getByRole('button', { name: 'ช่วงถัดไป', exact: true }).click();
+  await expect(page.getByLabel('เริ่มวันที่')).toHaveValue(
+    day(info.project.name === 'mobile' ? 15 : 14),
+  );
+  await page.goBack();
+  await expect(page.getByLabel('เริ่มวันที่')).toHaveValue(date);
+  await expect(page.locator('.agenda-range')).toContainText(' – ');
+  await page.getByRole('button', { name: 'รายวัน', exact: true }).click();
+  await page.locator('.availability-lookup summary').click();
+  const catalog = await (await page.request.get('/api/admin/catalog')).json();
+  const service = catalog.services.find((s: { name: string }) => s.name === 'ตัดผม');
+  await page.getByLabel('บริการสำหรับหาเวลาว่าง').selectOption(service.id);
+  const expected = await (
+    await page.request.get('/api/availability', {
+      params: {
+        staffId: selectedStaff,
+        serviceIds: service.id,
+        date,
+      },
+    })
+  ).json();
+  const next = new Intl.DateTimeFormat('th-TH', {
+    timeZone: 'Asia/Bangkok',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(new Date(expected.slots[0]));
+  await expect(page.locator('.availability-staff')).toContainText(`ว่างถัดไป ${next}`);
+  await page.getByLabel('ค้นหานัด', { exact: true }).fill('ไม่มีชื่อนี้');
+  await expect(page.getByText('ไม่พบนัดที่ตรงกับตัวกรองในช่วงวันที่นี้')).toBeVisible();
+  await page.getByRole('button', { name: 'ล้างตัวกรอง', exact: true }).click();
+  await expect(page.getByLabel('ค้นหานัด', { exact: true })).toHaveValue('');
+  await expect(page.getByLabel('กรองช่าง', { exact: true })).toHaveValue('');
+  const booking = page.locator('.booking-card:visible').first();
+  await booking.click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toHaveAccessibleName(/^นัด BB-/);
+  await dialog.press('Escape');
+  await expect(dialog).not.toBeVisible();
+  await expect(booking).toBeFocused();
 });

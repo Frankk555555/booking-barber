@@ -14,7 +14,13 @@ function useRefresh() {
     void q.invalidateQueries({ queryKey: ['slots'] });
   };
 }
-export function ServicesPanel({ data }: { data: Catalog }) {
+export function ServicesPanel({
+  data,
+  onSaved,
+}: {
+  data: Catalog;
+  onSaved: (message: string) => void;
+}) {
   const [editing, setEditing] = useState<Catalog['services'][number] | 'new' | null>(null);
   return (
     <section>
@@ -23,7 +29,14 @@ export function ServicesPanel({ data }: { data: Catalog }) {
           <h2>บริการของร้าน</h2>
           <p className="muted">ราคาและระยะเวลาใช้เหมือนกันทุกช่าง</p>
         </div>
-        <Button onClick={() => setEditing('new')}>+ เพิ่มบริการ</Button>
+        <Button
+          onClick={() => {
+            onSaved('');
+            setEditing('new');
+          }}
+        >
+          + เพิ่มบริการ
+        </Button>
       </div>
       <div className="management-list">
         {data.services.map((s) => (
@@ -38,7 +51,13 @@ export function ServicesPanel({ data }: { data: Catalog }) {
             <span className={`badge ${s.active ? 'status-confirmed' : 'status-cancelled'}`}>
               {s.active ? 'เปิดรับจอง' : 'ปิดรับจอง'}
             </span>
-            <Button variant="secondary" onClick={() => setEditing(s)}>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                onSaved('');
+                setEditing(s);
+              }}
+            >
               แก้ไข
             </Button>
           </div>
@@ -51,7 +70,10 @@ export function ServicesPanel({ data }: { data: Catalog }) {
         >
           <ServiceForm
             initial={editing === 'new' ? undefined : editing}
-            onDone={() => setEditing(null)}
+            onDone={() => {
+              setEditing(null);
+              onSaved('บันทึกบริการแล้ว');
+            }}
           />
         </Modal>
       )}
@@ -188,7 +210,13 @@ function ServiceForm({
     </form>
   );
 }
-export function StaffPanel({ data }: { data: Catalog }) {
+export function StaffPanel({
+  data,
+  onSaved,
+}: {
+  data: Catalog;
+  onSaved: (message: string) => void;
+}) {
   const [editing, setEditing] = useState<Catalog['staff'][number] | 'new' | null>(null);
   return (
     <section>
@@ -197,7 +225,14 @@ export function StaffPanel({ data }: { data: Catalog }) {
           <h2>ช่างและตารางงาน</h2>
           <p className="muted">กำหนดบริการที่ทำได้และเวลารับงานของแต่ละคน</p>
         </div>
-        <Button onClick={() => setEditing('new')}>+ เพิ่มช่าง</Button>
+        <Button
+          onClick={() => {
+            onSaved('');
+            setEditing('new');
+          }}
+        >
+          + เพิ่มช่าง
+        </Button>
       </div>
       <div className="staff-management-grid">
         {data.staff.map((s, i) => (
@@ -218,7 +253,13 @@ export function StaffPanel({ data }: { data: Catalog }) {
                 .map((v) => v.name)
                 .join(' · ') || 'ยังไม่ได้เลือกบริการ'}
             </p>
-            <Button variant="secondary" onClick={() => setEditing(s)}>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                onSaved('');
+                setEditing(s);
+              }}
+            >
               แก้ไขข้อมูลและตารางงาน
             </Button>
           </article>
@@ -232,7 +273,10 @@ export function StaffPanel({ data }: { data: Catalog }) {
           <StaffForm
             initial={editing === 'new' ? undefined : editing}
             data={data}
-            onDone={() => setEditing(null)}
+            onDone={() => {
+              setEditing(null);
+              onSaved('บันทึกข้อมูลช่างและตารางงานแล้ว');
+            }}
           />
         </Modal>
       )}

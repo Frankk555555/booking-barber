@@ -374,7 +374,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    min-height: 43px;
+    min-height: 44px;
     padding: 10px 20px;
     border-radius: 7px;
     border: 1px solid transparent;
@@ -882,8 +882,8 @@
     place-items: center;
     border: 1px solid var(--color-line);
     border-radius: 50%;
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     background: #fff;
     flex-shrink: 0;
   }
@@ -931,7 +931,7 @@
   .admin-shell {
     max-width: 1250px;
     margin: auto;
-    padding: 40px;
+    padding: 28px 40px;
   }
   .admin-heading {
     display: flex;
@@ -940,14 +940,14 @@
     gap: 20px;
   }
   .admin-heading h1 {
-    font-size: 30px;
-    margin: 10px 0 6px;
+    font-size: 26px;
+    margin: 0 0 3px;
   }
   .admin-tabs {
     display: flex;
     gap: 20px;
     border-bottom: 1px solid var(--color-line);
-    margin-top: 30px;
+    margin-top: 20px;
     overflow-x: auto;
   }
   .admin-tabs button {
@@ -967,7 +967,18 @@
     color: var(--color-brand);
   }
   .admin-content {
-    margin-top: 30px;
+    margin-top: 22px;
+  }
+  .workspace-feedback:empty {
+    display: none;
+  }
+  .workspace-feedback .notice {
+    margin-top: 16px;
+  }
+  .admin-shell .section-heading > .button,
+  .admin-heading > .button {
+    flex-shrink: 0;
+    white-space: nowrap;
   }
   .section-heading {
     display: flex;
@@ -988,7 +999,16 @@
     align-items: center;
     gap: 15px;
     flex-wrap: wrap;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
+  }
+  .date-navigation {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .date-navigation > .button {
+    min-width: 44px;
+    padding: 8px;
   }
   .segmented {
     display: flex;
@@ -1003,6 +1023,7 @@
     border-radius: 6px;
     padding: 8px 14px;
     font-size: 13px;
+    min-height: 44px;
   }
   .segmented .selected {
     background: #fff;
@@ -1018,13 +1039,74 @@
   .booking-filters {
     display: flex;
     gap: 12px;
-    margin-bottom: 25px;
+    margin-bottom: 12px;
   }
   .booking-filters input {
     max-width: 360px;
   }
+  .booking-extra-filters {
+    display: contents;
+  }
+  .filter-toggle {
+    display: none;
+  }
   .booking-filters select {
-    width: 190px;
+    width: 170px;
+  }
+  .agenda-range {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 16px;
+    font-size: 13px;
+    margin: 12px 0 4px;
+  }
+  .availability-lookup {
+    border-bottom: 1px solid var(--color-line);
+    margin-bottom: 16px;
+  }
+  .availability-lookup summary {
+    cursor: pointer;
+    min-height: 44px;
+    padding: 10px 0;
+    color: var(--color-brand);
+  }
+  .availability-lookup summary svg {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 5px;
+  }
+  .availability-lookup summary:focus-visible {
+    outline: 3px solid var(--color-brand);
+    outline-offset: 3px;
+  }
+  .availability-content {
+    display: grid;
+    gap: 12px;
+    padding-bottom: 16px;
+  }
+  .availability-content > .field {
+    max-width: 380px;
+  }
+  .availability-staff {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .availability-staff li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    border-top: 1px solid var(--color-line);
+    padding: 10px 0;
+  }
+  .mobile-agenda {
+    display: none;
+  }
+  .admin-shell .empty .button {
+    margin-top: 12px;
   }
   .calendar-scroll,
   .table-scroll {
@@ -1044,7 +1126,7 @@
     border-radius: 9px;
     padding: 17px;
     background: #f4f1eb;
-    min-height: 330px;
+    min-height: 180px;
   }
   .calendar-column > h3 {
     font-size: 14px;
@@ -1059,12 +1141,12 @@
     gap: 6px;
     width: 100%;
     border: 1px solid var(--color-line);
-    border-left: 3px solid #8b9d76;
     border-radius: 7px;
     background: #fff;
     text-align: left;
     padding: 14px;
     margin-top: 13px;
+    overflow-wrap: anywhere;
   }
   .booking-card-time {
     font-family: Arial, sans-serif;
@@ -1078,14 +1160,7 @@
   }
   .booking-card.status-border-cancelled,
   .booking-card.status-border-no_show {
-    border-left-color: #c0a49a;
     opacity: 0.7;
-  }
-  .booking-card.status-border-in_service {
-    border-left-color: #c89b51;
-  }
-  .booking-card.status-border-completed {
-    border-left-color: #8ca1b8;
   }
   table {
     border-collapse: collapse;
@@ -1107,10 +1182,11 @@
   th button {
     background: transparent;
     border: 0;
+    min-height: 44px;
   }
   td .button {
     padding: 7px 12px;
-    min-height: 36px;
+    min-height: 44px;
   }
   .booking-detail {
     display: grid;
@@ -1214,7 +1290,7 @@
     min-width: 21px;
   }
   .hours-controls > .button {
-    min-height: 30px;
+    min-height: 44px;
     padding: 4px 8px;
     font-size: 12px;
   }
@@ -1226,6 +1302,10 @@
     font-size: 13px;
     text-decoration: underline;
     text-underline-offset: 3px;
+  }
+  .hours-editor .text-link {
+    min-height: 44px;
+    min-width: 44px;
   }
   .time-off-row {
     border-top: 1px solid var(--color-line);
@@ -1356,26 +1436,62 @@
     margin-top: 32px;
   }
   .admin-shell {
-    padding: 30px 20px;
+    padding: 16px 20px calc(100px + env(safe-area-inset-bottom));
+  }
+  .admin-header .header-inner {
+    min-height: 64px;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
   .admin-heading {
     align-items: flex-start;
   }
   .admin-heading h1 {
-    font-size: 23px;
+    font-size: 20px;
   }
   .admin-heading > .button {
-    padding: 9px 11px;
-    min-width: 100px;
+    padding: 9px 8px;
+    font-size: 12px;
   }
   .admin-heading .muted {
     font-size: 12px;
   }
   .admin-tabs {
-    gap: 17px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    overflow: visible;
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 20;
+    margin: 0;
+    padding: 0 12px env(safe-area-inset-bottom);
+    border-top: 1px solid var(--color-line);
+    border-bottom: 0;
+    background: var(--color-paper);
   }
   .admin-tabs button {
-    font-size: 13px;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 5px;
+    padding: 10px 0;
+    min-height: 64px;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .admin-content {
+    margin-top: 16px;
+  }
+  .admin-shell .section-heading {
+    margin-bottom: 12px;
+  }
+  .admin-shell .section-heading > div > .muted {
+    display: none;
+  }
+  .admin-shell .section-heading > .button {
+    padding: 10px 12px;
   }
   .section-heading h2 {
     font-size: 19px;
@@ -1391,7 +1507,27 @@
     grid-template-columns: 1fr;
   }
   .booking-filters {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .booking-filters input {
+    grid-column: 1 / -1;
+  }
+  .booking-extra-filters {
+    display: none;
+  }
+  .booking-extra-filters.open {
+    display: contents;
+  }
+  .booking-extra-filters select {
+    grid-column: 1 / -1;
+  }
+  .filter-toggle {
+    display: inline-flex;
+    padding: 8px;
+    font-size: 12px;
+    white-space: nowrap;
   }
   .booking-filters input,
   .booking-filters select {
@@ -1399,16 +1535,95 @@
     width: 100%;
   }
   .booking-toolbar {
-    gap: 10px;
+    gap: 8px;
+  }
+  .date-navigation {
+    width: 100%;
+  }
+  .date-navigation .compact-field {
+    flex: 1;
+    min-width: 0;
+    font-size: 12px;
+    gap: 4px;
+  }
+  .date-navigation .compact-field input {
+    width: 100%;
+    padding: 9px 6px;
+  }
+  .date-navigation .compact-field {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .date-navigation > .button {
+    align-self: flex-end;
+  }
+  .admin-shell input,
+  .admin-shell select,
+  .admin-shell textarea {
+    font-size: 16px;
   }
   .segmented {
     width: 100%;
   }
   .segmented button {
     flex: 1;
+    padding: 8px;
   }
   .calendar-board {
     grid-auto-columns: minmax(230px, 1fr);
+  }
+  .desktop-schedule {
+    display: none;
+  }
+  .desktop-schedule.list-schedule {
+    display: block;
+  }
+  .mobile-agenda {
+    display: block;
+  }
+  .mobile-agenda.hidden {
+    display: none;
+  }
+  .agenda-day + .agenda-day {
+    margin-top: 24px;
+  }
+  .agenda-day > h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  .mobile-agenda .booking-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px 12px;
+    border: 0;
+    border-top: 1px solid var(--color-line);
+    border-radius: 0;
+    background: transparent;
+    margin: 0;
+    padding: 14px 0;
+  }
+  .mobile-agenda .booking-card-time {
+    grid-column: 1;
+    font-size: 16px;
+    font-variant-numeric: tabular-nums;
+  }
+  .mobile-agenda .booking-card strong {
+    grid-column: 1 / -1;
+    font-size: 16px;
+  }
+  .mobile-agenda .booking-card .small {
+    grid-column: 1 / -1;
+    font-size: 14px;
+  }
+  .mobile-agenda .booking-card .badge {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    font-size: 12px;
+  }
+  .availability-staff li,
+  .availability-content > .muted {
+    font-size: 14px;
   }
   .modal {
     padding: 20px;

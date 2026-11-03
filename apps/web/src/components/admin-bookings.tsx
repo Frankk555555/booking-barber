@@ -1,6 +1,8 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ChevronLeft, ChevronRight, Clock3, SlidersHorizontal } from 'lucide-react';
+import { useAdminNavigation } from '../lib/admin-navigation';
 import {
   flexRender,
   getCoreRowModel,
@@ -26,32 +28,54 @@ import { Button, Loading, ErrorNotice, Empty, StatusBadge, Modal } from './ui';
 import { BookingFlow } from './booking-flow';
 import { SlotPicker } from './slots';
 export function BookingsPanel({ catalog }: { catalog: Catalog }) {
-  const [view, setView] = useState<'day' | 'week' | 'list'>('day');
-  const [date, setDate] = useState(today());
-  const [filter, setFilter] = useState('');
-  const [status, setStatus] = useState('all');
+  const { params, update } = useAdminNavigation();
+  const view =
+    params.get('view') === 'week' ? 'week' : params.get('view') === 'list' ? 'list' : 'day';
+  const requestedDate = params.get('date') ?? '';
+  const date =
+    /^\d{4}-\d{2}-\d{2}$/.test(requestedDate) &&
+    Number.isFinite(Date.parse(requestedDate)) &&
+    new Date(requestedDate).toISOString().slice(0, 10) === requestedDate
+      ? requestedDate
+      : today();
+  const filter = params.get('q') ?? '';
+  const requestedStatus = params.get('status') ?? 'all';
+  const status = Object.hasOwn(labels, requestedStatus) ? requestedStatus : 'all';
+  const [showFilters, setShowFilters] = useState(Boolean(filter || status !== 'all'));
+  const filterId = useId();
+  const staffId = catalog.staff.some((s) => s.id === params.get('staff'))
+    ? params.get('staff')!
+    : '';
   const [selected, setSelected] = useState<BookingView | null>(null);
   const [adding, setAdding] = useState(false);
   const end = addDays(date, view === 'week' ? 6 : view === 'list' ? 29 : 0);
+  const days = Array.from({ length: view === 'week' ? 7 : view === 'list' ? 30 : 1 }, (_, i) =>
+    addDays(date, i),
+  );
+  const period = view === 'week' ? 7 : view === 'list' ? 30 : 1;
+  const hasFilters = Boolean(filter || status !== 'all' || staffId);
   const query = useQuery({
     queryKey: ['admin-bookings', date, end],
     queryFn: () => unwrap(api.api.admin.bookings.get({ query: { from: date, to: end } })),
     refetchInterval: 30000,
     staleTime: 0,
   });
-  const filtered = (query.data ?? []).filter(
-    (b) =>
-      (status === 'all' || b.status === status) &&
-      `${b.customerName} ${b.phone} ${b.reference} ${b.staffName}`
-        .toLocaleLowerCase()
-        .includes(filter.toLocaleLowerCase()),
-  );
+  const filtered = (query.data ?? [])
+    .filter(
+      (b) =>
+        (status === 'all' || b.status === status) &&
+        (!staffId || b.staffId === staffId) &&
+        `${b.customerName} ${b.phone} ${b.reference} ${b.staffName}`
+          .toLocaleLowerCase()
+          .includes(filter.toLocaleLowerCase()),
+    )
+    .sort((a, b) => a.startAt.localeCompare(b.startAt));
   return (
     <section>
       <div className="section-heading">
         <div>
           <h2>ตารางนัดหมาย</h2>
-          <p className="muted">คิวออนไลน์และหน้าร้านในตารางเดียว · อัปเดตทุก 30 วินาที</p>
+          <p className="muted">วาระนัดหมาย · อัปเดตทุก 30 วินาที</p>
         </div>
         <Button onClick={() => setAdding(true)}>+ เพิ่มนัด</Button>
       </div>
@@ -62,43 +86,95 @@ export function BookingsPanel({ catalog }: { catalog: Catalog }) {
               key={v}
               aria-pressed={view === v}
               className={view === v ? 'selected' : ''}
-              onClick={() => setView(v)}
+              onClick={() => update({ view: v })}
             >
-              {v === 'day' ? 'รายวัน' : v === 'week' ? 'รายสัปดาห์' : 'รายการ'}
+              {v === 'day' ? 'รายวัน' : v === 'week' ? 'รายสัปดาห์' : 'รายการ 30 วัน'}
             </button>
           ))}
         </div>
-        <label className="field compact-field">
-          เริ่มวันที่
-          <input
-            type="date"
-            required
-            value={date}
-            onChange={(e) => {
-              if (e.target.value) setDate(e.target.value);
-            }}
-          />
-        </label>
-        <Button variant="quiet" onClick={() => setDate(today())}>
-          วันนี้
-        </Button>
+        <div className="date-navigation">
+          <Button
+            variant="quiet"
+            aria-label="ช่วงก่อนหน้า"
+            onClick={() => update({ date: addDays(date, -period) })}
+          >
+            <ChevronLeft size={18} />
+          </Button>
+          <label className="field compact-field">
+            เริ่มวันที่
+            <input
+              type="date"
+              required
+              value={date}
+              onChange={(e) => {
+                if (e.target.value) update({ date: e.target.value });
+              }}
+            />
+          </label>
+          <Button
+            variant="quiet"
+            aria-label="ช่วงถัดไป"
+            onClick={() => update({ date: addDays(date, period) })}
+          >
+            <ChevronRight size={18} />
+          </Button>
+          <Button variant="quiet" onClick={() => update({ date: today() })}>
+            วันนี้
+          </Button>
+        </div>
       </div>
       <div className="booking-filters">
-        <input
-          aria-label="ค้นหานัด"
-          placeholder="ค้นหาชื่อ เบอร์ ช่าง หรือเลขนัด"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        />
-        <select aria-label="กรองสถานะ" value={status} onChange={(e) => setStatus(e.target.value)}>
-          <option value="all">ทุกสถานะ</option>
-          {Object.entries(labels).map(([key, text]) => (
-            <option key={key} value={key}>
-              {text}
+        <select
+          aria-label="กรองช่าง"
+          value={staffId}
+          onChange={(e) => update({ staff: e.target.value })}
+        >
+          <option value="">ทุกช่าง</option>
+          {catalog.staff.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name}
             </option>
           ))}
         </select>
+        <Button
+          variant="secondary"
+          className="filter-toggle"
+          aria-expanded={showFilters}
+          aria-controls={filterId}
+          onClick={() => setShowFilters(!showFilters)}
+        >
+          <SlidersHorizontal size={16} /> ค้นหาและสถานะ
+          {filter || status !== 'all' ? ' · ใช้อยู่' : ''}
+        </Button>
+        <div id={filterId} className={`booking-extra-filters${showFilters ? ' open' : ''}`}>
+          <input
+            aria-label="ค้นหานัด"
+            placeholder="ค้นหาชื่อ เบอร์ ช่าง หรือเลขนัด"
+            value={filter}
+            onChange={(e) => update({ q: e.target.value }, true)}
+          />
+          <select
+            aria-label="กรองสถานะ"
+            value={status}
+            onChange={(e) => update({ status: e.target.value })}
+          >
+            <option value="all">ทุกสถานะ</option>
+            {Object.entries(labels).map(([key, text]) => (
+              <option key={key} value={key}>
+                {text}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
+      <div className="agenda-range" role="status" aria-live="polite">
+        <span>
+          {dateLabel(date)}
+          {end !== date && ` – ${dateLabel(end)}`} · เวลาไทย
+        </span>
+        <span>{filtered.length} นัด</span>
+      </div>
+      <AvailabilityLookup catalog={catalog} date={date} staffId={staffId} />
       <ErrorNotice
         error={query.error}
         retry={() => {
@@ -107,61 +183,81 @@ export function BookingsPanel({ catalog }: { catalog: Catalog }) {
       />
       {query.isPending ? (
         <Loading />
-      ) : !filtered.length ? (
-        <Empty>ไม่มีนัดในช่วงวันที่หรือเงื่อนไขที่เลือก</Empty>
-      ) : view === 'list' ? (
-        <BookingsTable bookings={filtered} onSelect={setSelected} />
+      ) : query.error && !query.data ? null : !filtered.length ? (
+        <Empty>
+          <p>
+            {hasFilters ? 'ไม่พบนัดที่ตรงกับตัวกรองในช่วงวันที่นี้' : 'ยังไม่มีนัดในช่วงวันที่นี้'}
+          </p>
+          {hasFilters ? (
+            <Button variant="secondary" onClick={() => update({ q: '', status: '', staff: '' })}>
+              ล้างตัวกรอง
+            </Button>
+          ) : (
+            <Button variant="secondary" onClick={() => setAdding(true)}>
+              เพิ่มนัดใหม่
+            </Button>
+          )}
+        </Empty>
       ) : (
-        <div className="calendar-scroll">
-          <div className={`calendar-board ${view === 'week' ? 'weekly' : ''}`}>
-            {view === 'week'
-              ? Array.from({ length: 7 }, (_, i) => addDays(date, i)).map((d) => (
-                  <div className="calendar-column" key={d}>
-                    <h3>{dateLabel(d, true)}</h3>
-                    <span className="small muted">
-                      {
-                        filtered.filter(
-                          (b) =>
-                            new Intl.DateTimeFormat('en-CA', {
-                              timeZone: 'Asia/Bangkok',
-                              year: 'numeric',
-                              month: '2-digit',
-                              day: '2-digit',
-                            }).format(new Date(b.startAt)) === d,
-                        ).length
-                      }{' '}
-                      นัด
-                    </span>
-                    {filtered
-                      .filter(
-                        (b) =>
-                          new Intl.DateTimeFormat('en-CA', {
-                            timeZone: 'Asia/Bangkok',
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                          }).format(new Date(b.startAt)) === d,
-                      )
-                      .map((b) => (
-                        <BookingCard key={b.id} booking={b} onClick={() => setSelected(b)} />
-                      ))}
-                  </div>
-                ))
-              : catalog.staff.map((s) => (
-                  <div className="calendar-column" key={s.id}>
-                    <h3>{s.name}</h3>
-                    <span className="small muted">
-                      {filtered.filter((b) => b.staffId === s.id).length} นัด
-                    </span>
-                    {filtered
-                      .filter((b) => b.staffId === s.id)
-                      .map((b) => (
-                        <BookingCard key={b.id} booking={b} onClick={() => setSelected(b)} />
-                      ))}
-                  </div>
-                ))}
+        <>
+          <div className={`mobile-agenda${view === 'list' ? ' hidden' : ''}`}>
+            {days
+              .filter((d) => filtered.some((b) => bookingDate(b) === d))
+              .map((d) => (
+                <section className="agenda-day" key={d}>
+                  {view !== 'day' && <h3>{dateLabel(d)}</h3>}
+                  {filtered
+                    .filter((b) => bookingDate(b) === d)
+                    .map((b) => (
+                      <BookingCard key={b.id} booking={b} onClick={() => setSelected(b)} />
+                    ))}
+                </section>
+              ))}
           </div>
-        </div>
+          <div className={`desktop-schedule${view === 'list' ? ' list-schedule' : ''}`}>
+            {view === 'list' ? (
+              <BookingsTable bookings={filtered} onSelect={setSelected} />
+            ) : (
+              <div className="calendar-scroll">
+                <div className={`calendar-board ${view === 'week' ? 'weekly' : ''}`}>
+                  {view === 'week'
+                    ? Array.from({ length: 7 }, (_, i) => addDays(date, i)).map((d) => (
+                        <div className="calendar-column" key={d}>
+                          <h3>{dateLabel(d, true)}</h3>
+                          <span className="small muted">
+                            {filtered.filter((b) => bookingDate(b) === d).length} นัด
+                          </span>
+                          {filtered
+                            .filter((b) => bookingDate(b) === d)
+                            .map((b) => (
+                              <BookingCard key={b.id} booking={b} onClick={() => setSelected(b)} />
+                            ))}
+                        </div>
+                      ))
+                    : catalog.staff
+                        .filter((s) => !staffId || s.id === staffId)
+                        .map((s) => (
+                          <div className="calendar-column" key={s.id}>
+                            <h3>{s.name}</h3>
+                            <span className="small muted">
+                              {filtered.filter((b) => b.staffId === s.id).length} นัด
+                            </span>
+                            {filtered
+                              .filter((b) => b.staffId === s.id)
+                              .map((b) => (
+                                <BookingCard
+                                  key={b.id}
+                                  booking={b}
+                                  onClick={() => setSelected(b)}
+                                />
+                              ))}
+                          </div>
+                        ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </>
       )}
       {selected && (
         <BookingDialog booking={selected} catalog={catalog} onClose={() => setSelected(null)} />
@@ -174,6 +270,133 @@ export function BookingsPanel({ catalog }: { catalog: Catalog }) {
     </section>
   );
 }
+function bookingDate(booking: BookingView) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Bangkok',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date(booking.startAt));
+}
+
+function AvailabilityLookup({
+  catalog,
+  date,
+  staffId,
+}: {
+  catalog: Catalog;
+  date: string;
+  staffId: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [selectedService, setSelectedService] = useState('');
+  const services = catalog.services.filter((s) => s.active);
+  const service = services.find((s) => s.id === selectedService) ?? services[0];
+  const staff = catalog.staff.filter((s) => !staffId || s.id === staffId);
+  return (
+    <details
+      className="availability-lookup"
+      onToggle={(event) => setOpen(event.currentTarget.open)}
+    >
+      <summary>
+        <Clock3 size={16} /> หาเวลาว่างสำหรับนัดใหม่
+      </summary>
+      {open && (
+        <div className="availability-content">
+          <p className="muted">
+            {dateLabel(date)} · ตรวจเวลางาน เวลาพัก ช่วงปิดรับ และนัดที่มีอยู่
+          </p>
+          {date < today() || date > addDays(today(), catalog.shop.horizonDays) ? (
+            <p>
+              เลือกวันที่ตั้งแต่วันนี้ถึง {dateLabel(addDays(today(), catalog.shop.horizonDays))}{' '}
+              เพื่อหาเวลาว่าง
+            </p>
+          ) : !service ? (
+            <p>เพิ่มบริการที่เปิดรับจองเพื่อหาเวลาว่าง</p>
+          ) : (
+            <>
+              <label className="field">
+                บริการสำหรับหาเวลาว่าง
+                <select
+                  value={service.id}
+                  onChange={(event) => setSelectedService(event.target.value)}
+                >
+                  {services.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name} · {s.duration} นาที
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <ul className="availability-staff">
+                {staff.map((s) => (
+                  <NextAvailable key={s.id} staff={s} serviceId={service.id} date={date} />
+                ))}
+              </ul>
+              {!staff.length && <p>เพิ่มช่างเพื่อหาเวลาว่าง</p>}
+              <p className="small muted">
+                เวลาว่างถัดไปของแต่ละช่างในวันที่เลือก ·
+                ใช้เพิ่มนัดเพื่อจองและตรวจเวลาอีกครั้งก่อนยืนยัน
+              </p>
+            </>
+          )}
+        </div>
+      )}
+    </details>
+  );
+}
+
+function NextAvailable({
+  staff,
+  serviceId,
+  date,
+}: {
+  staff: Catalog['staff'][number];
+  serviceId: string;
+  date: string;
+}) {
+  const eligible = staff.active && staff.serviceIds.includes(serviceId);
+  const query = useQuery({
+    queryKey: ['slots', 'admin-overview', staff.id, serviceId, date],
+    queryFn: () =>
+      unwrap(
+        api.api.availability.get({ query: { staffId: staff.id, serviceIds: serviceId, date } }),
+      ),
+    enabled: eligible,
+    staleTime: 0,
+    refetchInterval: 30000,
+  });
+  const next = query.data?.slots.find((slot) => new Date(slot).getTime() > Date.now());
+  return (
+    <li>
+      <strong>{staff.name}</strong>
+      {!staff.active ? (
+        <span className="muted">ปิดรับจอง</span>
+      ) : !eligible ? (
+        <span className="muted">ไม่ได้ให้บริการนี้</span>
+      ) : query.isPending ? (
+        <span role="status">กำลังหาเวลาว่าง…</span>
+      ) : query.error ? (
+        <ErrorNotice
+          error={query.error}
+          retry={() => {
+            void query.refetch();
+          }}
+        />
+      ) : (
+        <span>
+          {next ? (
+            <>
+              ว่างถัดไป <strong>{time(next)}</strong>
+            </>
+          ) : (
+            'ไม่มีเวลาว่างสำหรับบริการนี้'
+          )}
+        </span>
+      )}
+    </li>
+  );
+}
 function BookingCard({ booking: b, onClick }: { booking: BookingView; onClick: () => void }) {
   return (
     <button className={`booking-card status-border-${b.status}`} onClick={onClick}>
@@ -181,7 +404,9 @@ function BookingCard({ booking: b, onClick }: { booking: BookingView; onClick: (
         {time(b.startAt)}–{time(b.endAt)}
       </span>
       <strong>{b.customerName}</strong>
-      <span className="small muted">{b.items.map((i) => i.name).join(' + ')}</span>
+      <span className="small muted booking-card-services">
+        {b.items.map((i) => i.name).join(' + ')} · {b.totalDuration} นาที
+      </span>
       <span className="small">{b.staffName}</span>
       <StatusBadge status={b.status} />
     </button>

@@ -1,13 +1,21 @@
 'use client';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useForm } from '@tanstack/react-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CalendarDays, Scissors, Users, Settings2, LogOut, LockKeyhole } from 'lucide-react';
 import { authClient, api, unwrap } from '../../lib/client';
+import { useAdminNavigation } from '../../lib/admin-navigation';
 import { Header, Loading, ErrorNotice, Button } from '../../components/ui';
 import { BookingsPanel } from '../../components/admin-bookings';
 import { ServicesPanel, StaffPanel, SettingsPanel } from '../../components/admin-settings';
 export default function AdminPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <AdminContent />
+    </Suspense>
+  );
+}
+function AdminContent() {
   const session = authClient.useSession();
   return (
     <>
@@ -105,7 +113,10 @@ function Login() {
 }
 function Dashboard({ name }: { name: string }) {
   const client = useQueryClient();
-  const [tab, setTab] = useState('bookings');
+  const { params, update } = useAdminNavigation();
+  const requestedTab = params.get('tab') ?? '';
+  const tab = ['services', 'staff', 'settings'].includes(requestedTab) ? requestedTab : 'bookings';
+  const [notice, setNotice] = useState('');
   const query = useQuery({
     queryKey: ['admin-catalog'],
     queryFn: () => unwrap(api.api.admin.catalog.get()),
@@ -128,9 +139,8 @@ function Dashboard({ name }: { name: string }) {
     <main className="admin-shell">
       <div className="admin-heading">
         <div>
-          <p className="eyebrow">SHOP WORKSPACE</p>
           <h1>{query.data?.shop.name ?? 'จัดการร้าน'}</h1>
-          <p className="muted">สวัสดี {name} วันนี้ให้เราช่วยดูแลนัดของคุณ</p>
+          <p className="muted">สวัสดี {name}</p>
         </div>
         <Button variant="secondary" disabled={logout.isPending} onClick={() => logout.mutate()}>
           <LogOut size={16} />
@@ -143,13 +153,16 @@ function Dashboard({ name }: { name: string }) {
             key={id}
             aria-current={tab === id ? 'page' : undefined}
             className={tab === id ? 'selected' : ''}
-            onClick={() => setTab(id)}
+            onClick={() => update({ tab: id })}
           >
             <Icon size={17} />
             {label}
           </button>
         ))}
       </nav>
+      <div className="workspace-feedback" role="status" aria-live="polite" aria-atomic="true">
+        {notice && <p className="notice">{notice}</p>}
+      </div>
       <ErrorNotice error={logout.error} />
       {query.isPending ? (
         <Loading />
@@ -165,9 +178,9 @@ function Dashboard({ name }: { name: string }) {
           {tab === 'bookings' ? (
             <BookingsPanel catalog={query.data} />
           ) : tab === 'services' ? (
-            <ServicesPanel data={query.data} />
+            <ServicesPanel data={query.data} onSaved={setNotice} />
           ) : tab === 'staff' ? (
-            <StaffPanel data={query.data} />
+            <StaffPanel data={query.data} onSaved={setNotice} />
           ) : (
             <SettingsPanel data={query.data} />
           )}

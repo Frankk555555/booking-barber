@@ -1,5 +1,12 @@
 'use client';
-import { useEffect, useRef, useState, type ReactNode, type ButtonHTMLAttributes } from 'react';
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ReactNode,
+  type ButtonHTMLAttributes,
+} from 'react';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -41,7 +48,7 @@ export function Button({
 export function Header({ admin = false }: { admin?: boolean }) {
   const catalog = useQuery({ queryKey: ['catalog'], queryFn: () => unwrap(api.api.catalog.get()) });
   return (
-    <header className="site-header">
+    <header className={`site-header${admin ? ' admin-header' : ''}`}>
       <div className="header-inner">
         <Link href="/" className="brand" aria-label="ละมุน บาร์เบอร์ หน้าหลัก">
           <span className="brand-mark">
@@ -112,17 +119,28 @@ export function Modal({
   onClose: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
   useEffect(() => {
     const dialog = ref.current;
+    const trigger = document.activeElement;
     dialog?.showModal();
     return () => {
       dialog?.close();
+      if (trigger instanceof HTMLElement && trigger.isConnected) trigger.focus();
     };
   }, []);
   return (
-    <dialog ref={ref} className="modal" onCancel={onClose}>
+    <dialog
+      ref={ref}
+      className="modal"
+      aria-labelledby={titleId}
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+    >
       <div className="modal-head">
-        <h2>{title}</h2>
+        <h2 id={titleId}>{title}</h2>
         <button className="icon-button" aria-label="ปิดหน้าต่าง" onClick={onClose}>
           <X size={20} />
         </button>
