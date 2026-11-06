@@ -1,0 +1,500 @@
+@font-face {
+  font-family: 'Sarabun Booking';
+  src: url('/fonts/sarabun-regular.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Sarabun Booking';
+  src: url('/fonts/sarabun-semibold.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 550 800;
+  font-display: swap;
+}
+
+@layer components {
+  .customer-experience {
+    --color-paper: #efe4d2;
+    --color-brand: #204464;
+    --color-ink: #204464;
+    --color-muted: #566570;
+    --color-line: #cec5b6;
+    --booking-surface: #faf7f0;
+    --booking-selected: #e5eced;
+    --booking-on-blue: #d4dfe5;
+    --booking-blue-line: #547089;
+    --booking-error: #9b3628;
+    min-height: 100dvh;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: 'Sarabun Booking', Tahoma, sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    color-scheme: light;
+  }
+  .customer-experience ::selection {
+    background: var(--color-brand);
+    color: var(--color-paper);
+  }
+  .customer-experience :is(button, a, input, select, textarea):focus-visible {
+    outline-color: var(--color-brand);
+  }
+  .customer-experience .site-header {
+    background: transparent;
+    border-color: var(--color-line);
+  }
+  .customer-experience .header-inner {
+    max-width: 1240px;
+    padding-block: 24px;
+  }
+  .customer-experience .brand {
+    font-size: 23px;
+    font-weight: 600;
+  }
+  .customer-experience .brand-mark {
+    width: 48px;
+    height: 48px;
+    border-color: var(--color-brand);
+    background: var(--color-brand);
+    color: var(--color-paper);
+  }
+  .customer-experience .brand-sub {
+    font-size: 12px;
+    letter-spacing: 0;
+    font-weight: 400;
+    margin-top: 6px;
+  }
+  .customer-experience .header-note {
+    display: none;
+  }
+  .customer-experience .header-link {
+    min-height: 44px;
+    font-size: 14px;
+  }
+  .customer-experience .page-shell {
+    max-width: 1240px;
+  }
+  .customer-experience .intro {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 24px;
+    padding: 48px 0 34px;
+  }
+  .customer-experience .intro h1 {
+    margin: 0 0 10px;
+    font-size: clamp(34px, 4vw, 48px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .customer-experience .intro p {
+    font-size: 16px;
+    color: var(--color-muted);
+  }
+  .customer-experience .intro .intro-note {
+    font-size: 14px;
+    flex-shrink: 0;
+    padding-bottom: 4px;
+  }
+  .customer-experience .booking-layout {
+    grid-template-columns: minmax(0, 1fr) 328px;
+    gap: 28px;
+  }
+  .customer-experience .booking-main {
+    background: var(--booking-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 18px;
+  }
+  .customer-experience .steps {
+    padding: 26px 32px;
+    gap: 12px;
+  }
+  .customer-experience .step {
+    flex-direction: column;
+    flex: 1;
+    gap: 8px;
+    min-height: 58px;
+    font-size: 13px;
+    color: var(--color-muted);
+  }
+  .customer-experience .step:disabled {
+    opacity: 1;
+  }
+  .customer-experience .step > span:first-child {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+    border-color: var(--color-line);
+    font-family: inherit;
+  }
+  .customer-experience .step.current {
+    color: var(--color-brand);
+  }
+  .customer-experience .step.current > span:first-child,
+  .customer-experience .step.complete > span:first-child {
+    background: var(--color-brand);
+    border-color: var(--color-brand);
+    color: var(--color-paper);
+  }
+  .customer-experience .step-panel {
+    padding: 32px;
+  }
+  .customer-experience .step-heading {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .customer-experience .step-description {
+    font-size: 15px;
+    margin-bottom: 28px;
+    max-width: 60ch;
+  }
+  .customer-experience .service-list {
+    gap: 0;
+    border-top: 1px solid var(--color-line);
+  }
+  .customer-experience .service-option {
+    gap: 16px;
+    border: 0;
+    border-bottom: 1px solid var(--color-line);
+    border-radius: 0;
+    background: transparent;
+    padding: 22px 12px;
+  }
+  .customer-experience .service-option:is(:hover, .selected) {
+    background: var(--booking-selected);
+  }
+  .customer-experience .service-option:focus-visible {
+    outline-offset: -3px;
+  }
+  .customer-experience .service-icon,
+  .customer-experience .selected .service-icon {
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    color: var(--color-brand);
+  }
+  .customer-experience .service-copy strong {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .customer-experience .service-copy > span,
+  .customer-experience .service-copy small {
+    font-size: 14px;
+  }
+  .customer-experience .service-price {
+    flex-direction: column;
+    gap: 10px;
+    font-size: 18px;
+    font-variant-numeric: tabular-nums;
+  }
+  .customer-experience .check-box {
+    width: 24px;
+    height: 24px;
+    border-color: var(--color-brand);
+    border-radius: 6px;
+  }
+  .customer-experience .button {
+    min-height: 48px;
+    border-radius: 8px;
+    padding: 12px 22px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .customer-experience .button-primary {
+    background: var(--color-brand);
+    color: var(--booking-surface);
+  }
+  .customer-experience .button-primary:hover:not(:disabled) {
+    background: #15334d;
+  }
+  .customer-experience .button-secondary,
+  .customer-experience .button-quiet:hover:not(:disabled) {
+    background: var(--booking-surface);
+    border-color: var(--color-line);
+  }
+  .customer-experience .step-actions {
+    margin-top: 28px;
+    border-top: 0;
+    padding-top: 0;
+  }
+  .customer-experience .summary {
+    background: var(--color-brand);
+    color: var(--color-paper);
+    border: 0;
+    border-radius: 18px;
+    padding: 28px;
+  }
+  .customer-experience .summary-title {
+    color: var(--color-paper);
+    border-color: var(--booking-blue-line);
+    padding-bottom: 22px;
+  }
+  .customer-experience .summary-title h3 {
+    color: inherit;
+    font-size: 22px;
+    font-weight: 600;
+  }
+  .customer-experience .summary :is(.muted, .summary-meta p, .summary-meta svg) {
+    color: var(--booking-on-blue);
+  }
+  .customer-experience .summary-placeholder {
+    padding: 28px 0;
+    font-size: 15px;
+  }
+  .customer-experience .summary-services {
+    font-size: 16px;
+    padding: 24px 0;
+    gap: 14px;
+  }
+  .customer-experience .summary-services .row-between {
+    align-items: start;
+  }
+  .customer-experience .summary-services .row-between > span:last-child {
+    white-space: nowrap;
+  }
+  .customer-experience .summary-meta {
+    border-color: var(--booking-blue-line);
+    padding: 24px 0;
+    gap: 16px;
+  }
+  .customer-experience .summary-meta p {
+    font-size: 14px;
+  }
+  .customer-experience .summary-total {
+    margin-top: 22px;
+  }
+  .customer-experience .summary-total strong {
+    font-size: 34px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .customer-experience .summary > .small {
+    font-size: 14px;
+    margin-top: 8px;
+  }
+  .customer-experience .sidebar-note {
+    color: var(--color-brand);
+    padding: 24px 4px 0;
+  }
+  .customer-experience .sidebar-note strong,
+  .customer-experience .sidebar-note p,
+  .customer-experience .shop-info {
+    font-size: 14px;
+    color: var(--color-muted);
+  }
+  .customer-experience .sidebar-note strong {
+    color: var(--color-brand);
+    font-weight: 600;
+  }
+  .customer-experience .shop-info {
+    padding-inline: 4px;
+  }
+  .customer-experience .barber-option {
+    background: transparent;
+    border-color: var(--color-line);
+    border-radius: 12px;
+  }
+  .customer-experience .barber-option.selected {
+    background: var(--booking-selected);
+    border-color: var(--color-brand);
+  }
+  .customer-experience .barber-option .muted,
+  .customer-experience .barber-select {
+    font-size: 14px;
+  }
+  .customer-experience .avatar {
+    background: var(--booking-selected);
+    color: var(--color-brand);
+  }
+  .customer-experience .field {
+    font-size: 16px;
+  }
+  .customer-experience :is(input, textarea, select) {
+    font-size: 16px;
+    border-color: var(--color-line);
+    background: var(--booking-surface);
+    caret-color: var(--color-brand);
+  }
+  .customer-experience input[aria-invalid='true'] {
+    border-color: var(--booking-error);
+  }
+  .customer-experience .field-error {
+    font-size: 14px;
+    color: var(--booking-error);
+  }
+  .customer-experience :is(.privacy-note, .notice:not(.error), .empty) {
+    background: var(--booking-selected);
+    color: var(--color-brand);
+    font-size: 14px;
+  }
+  .customer-experience .date-chip {
+    background: var(--booking-surface);
+    border-color: var(--color-line);
+  }
+  .customer-experience .date-chip.selected {
+    background: var(--color-brand);
+    border-color: var(--color-brand);
+    color: var(--color-paper);
+  }
+  .customer-experience .date-chip > span {
+    font-size: 14px;
+  }
+  .customer-experience .date-chip.selected > span {
+    color: var(--color-paper);
+  }
+  .customer-experience .date-chip > strong {
+    font-family: inherit;
+  }
+  .customer-experience .time-slot {
+    min-height: 48px;
+    font-size: 16px;
+    background: var(--booking-surface);
+  }
+  .customer-experience .time-slot.selected {
+    background: var(--color-brand);
+    color: var(--color-paper);
+  }
+  .customer-experience .confirmation span {
+    font-size: 16px;
+  }
+  .customer-experience .receipt-paper {
+    background: var(--booking-surface);
+    border-color: var(--color-line);
+    border-radius: 18px;
+  }
+  .customer-experience .site-footer {
+    font-size: 14px;
+    color: var(--color-muted);
+    padding-block: 24px 32px;
+  }
+  .customer-experience .manage-shell {
+    margin-block: 0;
+    padding-block: 40px;
+  }
+  .customer-experience .modal {
+    background: var(--booking-surface);
+  }
+}
+
+@media (max-width: 1000px) {
+  .customer-experience .booking-layout {
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 20px;
+  }
+  .customer-experience .step-panel,
+  .customer-experience .steps {
+    padding: 24px;
+  }
+  .customer-experience .summary {
+    padding: 24px;
+  }
+}
+@media (max-width: 760px) {
+  .customer-experience .header-inner {
+    padding: 20px;
+    gap: 12px;
+  }
+  .customer-experience .brand {
+    font-size: 20px;
+    gap: 10px;
+  }
+  .customer-experience .brand-mark {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+  .customer-experience .intro {
+    display: block;
+    padding: 28px 0;
+  }
+  .customer-experience .intro p {
+    font-size: 15px;
+  }
+  .customer-experience .intro .intro-note {
+    display: none;
+  }
+  .customer-experience .booking-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  .customer-experience .steps {
+    padding: 20px 14px;
+    gap: 6px;
+  }
+  .customer-experience .step {
+    font-size: 12px;
+  }
+  .customer-experience .step-panel {
+    padding: 24px 20px;
+  }
+  .customer-experience .step-heading {
+    font-size: 23px;
+  }
+  .customer-experience .service-option {
+    padding: 20px 8px;
+    gap: 10px;
+  }
+  .customer-experience .service-icon {
+    display: none;
+  }
+  .customer-experience .service-copy strong,
+  .customer-experience .service-price {
+    font-size: 17px;
+  }
+  .customer-experience .service-copy > span {
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .customer-experience .mobile-booking-total {
+    font-size: 15px;
+    padding-top: 20px;
+    margin-top: 24px;
+  }
+  .customer-experience .mobile-booking-total strong {
+    font-size: 28px;
+  }
+  .customer-experience .mobile-booking-total + .step-actions {
+    margin-top: 16px;
+  }
+  .customer-experience .button {
+    padding: 12px 16px;
+  }
+  .customer-experience .booking-sidebar .summary {
+    padding: 24px;
+  }
+  .customer-experience .site-footer {
+    align-items: start;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin-top: 32px;
+  }
+}
+@media (max-width: 380px) {
+  .customer-experience .header-inner {
+    padding: 16px 13px;
+  }
+  .customer-experience .brand {
+    font-size: 18px;
+  }
+  .customer-experience .header-link {
+    font-size: 12px;
+    gap: 4px;
+  }
+  .customer-experience .step-panel {
+    padding: 22px 15px;
+  }
+  .customer-experience .steps {
+    padding-inline: 10px;
+    gap: 4px;
+  }
+  .customer-experience .step {
+    font-size: 11px;
+  }
+}
+@media print {
+  .customer-experience {
+    background: white;
+  }
+}

@@ -3,11 +3,7 @@
   "project": {
     "name": "booking-barber",
     "productType": "Single-shop Thai appointment booking",
-    "stack": [
-      "nextjs",
-      "react",
-      "tailwind-v4"
-    ]
+    "stack": ["nextjs", "react", "tailwind-v4"]
   },
   "sources": {
     "tokens": [],
@@ -35,6 +31,11 @@
     "avoid": []
   },
   "decisions": [
+    {
+      "id": "customer-navy-sand-v2",
+      "decision": "Customer booking and appointment management use user-selected sand #EFE4D2 and navy #204464. Sarabun is self-hosted, services form a scannable list, and the navy appointment summary anchors the desktop layout. Mobile retains totals beside the next action. Admin keeps its existing appearance.",
+      "source": "User-requested customer redesign, 2026-11-04; 21st search unavailable because the CLI is not signed in."
+    },
     {
       "id": "thai-light-booking-v1",
       "decision": "Thai-first, mobile-first booking interface with warm paper backgrounds, restrained terracotta accents, readable controls, and a five-step customer flow.",

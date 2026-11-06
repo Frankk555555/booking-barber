@@ -1,5 +1,6 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from '@tanstack/react-form';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -21,6 +22,7 @@ import {
   dateLabel,
   today,
   requestKey,
+  manageLink,
   type BookingView,
   ApiError,
 } from '../lib/client';
@@ -34,6 +36,12 @@ export function BookingFlow({
   admin?: boolean;
   onCreated?: () => void;
 }) {
+  const router = useRouter();
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const previousStep = useRef(0);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const formId = useId();
   const queryClient = useQueryClient();
   const catalog = useQuery({ queryKey: ['catalog'], queryFn: () => unwrap(api.api.catalog.get()) });
   const [step, setStep] = useState(0);
@@ -42,10 +50,21 @@ export function BookingFlow({
   const [date, setDate] = useState(today());
   const [slot, setSlot] = useState('');
   const [done, setDone] = useState<{ booking: BookingView; token: string } | null>(null);
+  useEffect(() => {
+    if (previousStep.current !== step) {
+      previousStep.current = step;
+      const frame = requestAnimationFrame(() => headingRef.current?.focus());
+      return () => cancelAnimationFrame(frame);
+    }
+  }, [step]);
   const contact = useForm({
     defaultValues: { customerName: '', phone: '' },
     onSubmit: async () => {
       setStep(4);
+    },
+    onSubmitInvalid: ({ formApi }) => {
+      if (formApi.getFieldMeta('customerName')?.errors.length) nameRef.current?.focus();
+      else phoneRef.current?.focus();
     },
   });
   const [contactValues, setContactValues] = useState({ customerName: '', phone: '' });
@@ -69,6 +88,7 @@ export function BookingFlow({
     },
     onSuccess: (data) => {
       setDone(data);
+      if (!admin) router.replace(manageLink(data.token));
       void queryClient.invalidateQueries({ queryKey: ['admin-bookings'] });
       void queryClient.invalidateQueries({ queryKey: ['slots'] });
       onCreated?.();
@@ -144,8 +164,11 @@ export function BookingFlow({
           ))}
         </nav>
         <div className="step-panel">
-          <p className="eyebrow">STEP {String(step + 1).padStart(2, '0')} / 05</p>
-          <h2>
+          {admin && <p className="eyebrow">STEP {String(step + 1).padStart(2, '0')} / 05</p>}
+          <h2 ref={headingRef} tabIndex={-1} className="step-heading">
+            <span className="sr-only">
+              ขั้นที่ {step + 1} จาก {steps.length}:{' '}
+            </span>
             {
               [
                 'วันนี้ ให้เราดูแลอะไรดีครับ',
@@ -260,8 +283,9 @@ export function BookingFlow({
           )}
           {step === 3 && (
             <form
-              id="contact-form"
+              id={formId}
               className="contact-form"
+              noValidate
               onSubmit={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -276,10 +300,16 @@ export function BookingFlow({
                 }}
               >
                 {(field) => (
-                  <label className="field">
-                    ชื่อผู้จอง
+                  <div className="field">
+                    <label htmlFor={`${formId}-name`}>ชื่อผู้จอง</label>
                     <input
+                      id={`${formId}-name`}
+                      ref={nameRef}
                       autoComplete="name"
+                      aria-invalid={field.state.meta.errors.length > 0}
+                      aria-describedby={
+                        field.state.meta.errors.length ? `${formId}-name-error` : undefined
+                      }
                       required
                       minLength={2}
                       maxLength={100}
@@ -291,12 +321,12 @@ export function BookingFlow({
                         setContactValues((v) => ({ ...v, customerName: e.target.value }));
                       }}
                     />
-                    {field.state.meta.errors.map((e) => (
-                      <span className="field-error" key={String(e)}>
-                        {String(e)}
+                    {field.state.meta.errors.length > 0 && (
+                      <span id={`${formId}-name-error`} className="field-error" role="status">
+                        {field.state.meta.errors.join(' ')}
                       </span>
-                    ))}
-                  </label>
+                    )}
+                  </div>
                 )}
               </contact.Field>
               <contact.Field
@@ -309,10 +339,16 @@ export function BookingFlow({
                 }}
               >
                 {(field) => (
-                  <label className="field">
-                    เบอร์โทรศัพท์
+                  <div className="field">
+                    <label htmlFor={`${formId}-phone`}>เบอร์โทรศัพท์</label>
                     <input
+                      id={`${formId}-phone`}
+                      ref={phoneRef}
                       type="tel"
+                      aria-invalid={field.state.meta.errors.length > 0}
+                      aria-describedby={
+                        field.state.meta.errors.length ? `${formId}-phone-error` : undefined
+                      }
                       autoComplete="tel"
                       inputMode="tel"
                       required
@@ -325,12 +361,12 @@ export function BookingFlow({
                         setContactValues((v) => ({ ...v, phone: e.target.value }));
                       }}
                     />
-                    {field.state.meta.errors.map((e) => (
-                      <span className="field-error" key={String(e)}>
-                        {String(e)}
+                    {field.state.meta.errors.length > 0 && (
+                      <span id={`${formId}-phone-error`} className="field-error" role="status">
+                        {field.state.meta.errors.join(' ')}
                       </span>
-                    ))}
-                  </label>
+                    )}
+                  </div>
                 )}
               </contact.Field>
               <p className="privacy-note">
@@ -364,6 +400,20 @@ export function BookingFlow({
               </p>
             </div>
           )}
+          <div className="mobile-booking-total" role="status" aria-atomic="true">
+            <div>
+              <span>
+                {chosen.length
+                  ? `${chosen.length} บริการ · ${duration} นาที`
+                  : 'ยังไม่ได้เลือกบริการ'}
+              </span>
+              <small>ชำระค่าบริการที่ร้าน</small>
+            </div>
+            <strong>
+              <span className="sr-only">ยอดรวม </span>
+              {money(total)}
+            </strong>
+          </div>
           <div className="step-actions">
             {step > 0 ? (
               <Button variant="quiet" disabled={submit.isPending} onClick={() => setStep(step - 1)}>
@@ -374,7 +424,7 @@ export function BookingFlow({
               <span />
             )}
             {step === 3 ? (
-              <Button type="submit" form="contact-form">
+              <Button type="submit" form={formId}>
                 ตรวจสอบนัด
                 <ChevronRight size={17} />
               </Button>
@@ -400,9 +450,9 @@ export function BookingFlow({
           </div>
           {chosen.length === 0 ? (
             <p className="muted summary-placeholder">
-              เลือกบริการที่คุณต้องการ
+              บริการที่เลือกจะแสดงที่นี่
               <br />
-              แล้วเริ่มเวลาพักของคุณได้เลย
+              พร้อมราคาและระยะเวลารวม
             </p>
           ) : (
             <div className="summary-services">

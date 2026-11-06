@@ -50,13 +50,17 @@ export function Header({ admin = false }: { admin?: boolean }) {
   return (
     <header className={`site-header${admin ? ' admin-header' : ''}`}>
       <div className="header-inner">
-        <Link href="/" className="brand" aria-label="ละมุน บาร์เบอร์ หน้าหลัก">
+        <Link
+          href="/"
+          className="brand"
+          aria-label={`${catalog.data?.shop.name ?? 'ละมุน บาร์เบอร์'} หน้าหลัก`}
+        >
           <span className="brand-mark">
             <Scissors size={23} strokeWidth={1.5} />
           </span>
           <span>
             {catalog.data?.shop.name ?? 'ละมุน บาร์เบอร์'}
-            <span className="brand-sub">BARBER & CARE</span>
+            <span className="brand-sub">{admin ? 'BARBER & CARE' : 'จองคิวตัดผม'}</span>
           </span>
         </Link>
         <div className="header-right">

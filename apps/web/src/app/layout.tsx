@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Providers } from '../components/providers';
 import './globals.css';
+import './customer.css';
 export const metadata: Metadata = {
   title: 'ละมุน บาร์เบอร์ | จองเวลาสำหรับคุณ',
   description: 'เลือกบริการ ช่าง และเวลาที่สะดวก จองคิวตัดผมได้ง่าย ไม่ต้องสมัครสมาชิก',

@@ -2,6 +2,18 @@ import type { NextConfig } from 'next';
 const config: NextConfig = {
   poweredByHeader: false,
   distDir: process.env.NEXT_DIST_DIR ?? '.next',
+  async redirects() {
+    const appUrl = new URL(process.env.APP_URL ?? 'http://localhost:3000');
+    if (!['localhost', '127.0.0.1'].includes(appUrl.hostname)) return [];
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: appUrl.hostname === 'localhost' ? '127.0.0.1' : 'localhost' }],
+        destination: `${appUrl.origin}/:path*`,
+        permanent: false,
+      },
+    ];
+  },
   async rewrites() {
     return [
       {

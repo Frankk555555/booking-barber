@@ -21,7 +21,12 @@ async function login(page: Page) {
   await page.getByRole('button', { name: 'เข้าสู่ระบบ', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'ตารางนัดหมาย', exact: true })).toBeVisible();
 }
-async function fillBooking(scope: Page | Locator, offset: number, customer: string) {
+async function fillBooking(
+  scope: Page | Locator,
+  offset: number,
+  customer: string,
+  embedded = false,
+) {
   await scope.getByRole('button', { name: /ตัดผม.*ออกแบบทรง/ }).click();
   await scope.getByRole('button', { name: /สระผม.*สระสะอาด/ }).click();
   await scope.getByRole('button', { name: 'ถัดไป', exact: true }).click();
@@ -35,7 +40,12 @@ async function fillBooking(scope: Page | Locator, offset: number, customer: stri
   await scope.getByLabel('เบอร์โทรศัพท์', { exact: true }).fill('0812345678');
   await scope.getByRole('button', { name: 'ตรวจสอบนัด', exact: true }).click();
   await scope.getByRole('button', { name: 'ยืนยันการจอง', exact: true }).click();
-  await expect(scope.getByRole('heading', { name: 'จองเรียบร้อย แล้วพบกันครับ' })).toBeVisible();
+  await expect(
+    scope.getByRole('heading', {
+      name: embedded ? 'จองเรียบร้อย แล้วพบกันครับ' : 'นัดของคุณ',
+      exact: true,
+    }),
+  ).toBeVisible();
 }
 test('customer books, downloads receipt, reschedules and cancels using a private link', async ({
   page,
@@ -44,6 +54,9 @@ test('customer books, downloads receipt, reschedules and cancels using a private
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');
   await fillBooking(page, info.project.name === 'mobile' ? 2 : 1, `ลูกค้า ${info.project.name}`);
+  await expect(page).toHaveURL(/\/booking\/manage#[A-Za-z0-9_-]{43}$/);
+  await page.reload();
+  await expect(page.locator('.receipt-paper')).toContainText(`ลูกค้า ${info.project.name}`);
   await expect(page.locator('.receipt-total')).toContainText('350');
   const downloadEvent = page.waitForEvent('download');
   await page.getByRole('button', { name: 'บันทึกใบนัด', exact: true }).click();
@@ -76,6 +89,7 @@ test('owner manages services, staff, shop settings and offline bookings', async 
     page.getByRole('dialog'),
     info.project.name === 'mobile' ? 8 : 7,
     `หน้าร้าน ${info.project.name}`,
+    true,
   );
   await page.getByRole('dialog').getByRole('button', { name: 'ปิดหน้าต่าง' }).click();
   await page.getByLabel('เริ่มวันที่').fill(day(info.project.name === 'mobile' ? 8 : 7));

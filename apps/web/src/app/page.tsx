@@ -2,17 +2,19 @@ import { BookingFlow } from '../components/booking-flow';
 import { Header } from '../components/ui';
 export default function Home() {
   return (
-    <>
+    <div className="customer-experience">
       <Header />
       <main className="page-shell">
         <section className="intro">
-          <p className="eyebrow">
-            <span className="tiny-line" /> A LITTLE TIME, JUST FOR YOU
+          <div>
+            <h1>จองคิวตัดผม</h1>
+            <p>เลือกบริการที่ชอบ แล้วเลือกช่างและเวลาที่สะดวก</p>
+          </div>
+          <p className="intro-note">
+            ไม่ต้องสมัครสมาชิก
+            <br />
+            ชำระค่าบริการที่ร้านในวันนัด
           </p>
-          <h1>
-            จองเวลาสำหรับ<span>ตัวคุณเอง</span>
-          </h1>
-          <p>ทรงผมที่ชอบ กับเวลาที่ใช่ เลือกนัดของคุณได้เลย</p>
         </section>
         <BookingFlow />
         <footer className="site-footer">
@@ -20,6 +22,6 @@ export default function Home() {
           <span>ใส่ใจทุกทรง เคารพทุกเวลา</span>
         </footer>
       </main>
-    </>
+    </div>
   );
 }

@@ -48,7 +48,7 @@ export default function ManagePage() {
     },
   });
   return (
-    <>
+    <div className="customer-experience">
       <Header />
       <main className="manage-shell">
         {token === null ? (
@@ -63,7 +63,6 @@ export default function ManagePage() {
           <ErrorNotice error={query.error ?? catalog.error} />
         ) : query.data && catalog.data ? (
           <>
-            <p className="eyebrow">YOUR APPOINTMENT</p>
             <h1>นัดของคุณ</h1>
             <BookingReceipt
               booking={query.data.booking}
@@ -151,6 +150,6 @@ export default function ManagePage() {
           </>
         ) : null}
       </main>
-    </>
+    </div>
   );
 }
