@@ -8,11 +8,14 @@ import { useAdminNavigation } from '../../lib/admin-navigation';
 import { Header, Loading, ErrorNotice, Button } from '../../components/ui';
 import { BookingsPanel } from '../../components/admin-bookings';
 import { ServicesPanel, StaffPanel, SettingsPanel } from '../../components/admin-settings';
+import './admin.css';
 export default function AdminPage() {
   return (
-    <Suspense fallback={<Loading />}>
-      <AdminContent />
-    </Suspense>
+    <div className="customer-experience admin-experience">
+      <Suspense fallback={<Loading />}>
+        <AdminContent />
+      </Suspense>
+    </div>
   );
 }
 function AdminContent() {
@@ -64,7 +67,6 @@ function Login() {
       <span className="login-icon">
         <LockKeyhole size={26} />
       </span>
-      <p className="eyebrow">FOR THE SHOP</p>
       <h1>ดูแลทุกนัด จากที่เดียว</h1>
       <p className="muted">เข้าสู่ระบบสำหรับเจ้าของร้านและผู้ดูแล</p>
       <form

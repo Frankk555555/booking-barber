@@ -60,7 +60,7 @@ export function Header({ admin = false }: { admin?: boolean }) {
           </span>
           <span>
             {catalog.data?.shop.name ?? 'ละมุน บาร์เบอร์'}
-            <span className="brand-sub">{admin ? 'BARBER & CARE' : 'จองคิวตัดผม'}</span>
+            <span className="brand-sub">{admin ? 'จัดการร้าน' : 'จองคิวตัดผม'}</span>
           </span>
         </Link>
         <div className="header-right">

@@ -1,0 +1,265 @@
+@layer components {
+  .admin-experience {
+    scrollbar-color: var(--color-muted) var(--color-paper);
+  }
+  .admin-experience .admin-shell {
+    max-width: 1240px;
+    padding-block: 40px 56px;
+  }
+  .admin-experience .admin-heading h1 {
+    font-size: clamp(26px, 3vw, 34px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+    overflow-wrap: anywhere;
+  }
+  .admin-experience .admin-heading > div {
+    min-width: 0;
+  }
+  .admin-experience .button {
+    min-height: 44px;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+  .admin-experience .button-quiet {
+    color: var(--color-brand);
+  }
+  .admin-experience .admin-tabs {
+    gap: 28px;
+    margin-top: 28px;
+  }
+  .admin-experience .admin-tabs button {
+    padding: 16px 8px;
+    font-size: 15px;
+    min-height: 48px;
+  }
+  .admin-experience .admin-tabs button:hover {
+    background: var(--booking-selected);
+    color: var(--color-brand);
+  }
+  .admin-experience .admin-tabs button.selected {
+    font-weight: 600;
+  }
+  .admin-experience .admin-content {
+    min-width: 0;
+    margin-top: 28px;
+    padding: 28px;
+    background: var(--booking-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 18px;
+  }
+  .admin-experience .section-heading h2 {
+    font-size: 24px;
+    font-weight: 600;
+  }
+  .admin-experience :is(.section-heading p, .small, .checkbox-label, .text-link) {
+    font-size: 14px;
+  }
+  .admin-experience .field {
+    font-size: 14px;
+  }
+  .admin-experience .segmented {
+    background: var(--color-paper);
+  }
+  .admin-experience .segmented button {
+    color: var(--color-muted);
+    font-size: 14px;
+  }
+  .admin-experience .segmented button:hover:not(.selected) {
+    color: var(--color-brand);
+    background: var(--booking-selected);
+  }
+  .admin-experience .segmented .selected {
+    background: var(--color-brand);
+    color: var(--booking-surface);
+    box-shadow: none;
+  }
+  .admin-experience :is(input, textarea, select)::placeholder {
+    color: var(--color-muted);
+    opacity: 1;
+  }
+  .admin-experience :is(.agenda-range, .availability-lookup summary, table) {
+    font-size: 14px;
+  }
+  .admin-experience :is(.calendar-column, .panel, .staff-card) {
+    background: transparent;
+    border-radius: 0;
+    border: 0;
+  }
+  .admin-experience .calendar-column {
+    border-top: 1px solid var(--color-line);
+    padding: 18px 0 0;
+  }
+  .admin-experience .calendar-column > h3 {
+    font-size: 16px;
+  }
+  .admin-experience .booking-card {
+    background: var(--color-paper);
+    border-color: var(--color-line);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .admin-experience .booking-card:hover {
+    background: var(--booking-selected);
+    border-color: var(--color-brand);
+  }
+  .admin-experience .booking-card strong {
+    font-size: 16px;
+  }
+  .admin-experience .booking-card-time {
+    font-family: inherit;
+    font-size: 16px;
+  }
+  .admin-experience :is(.booking-card-time, table, .management-row) {
+    font-variant-numeric: tabular-nums;
+  }
+  .admin-experience table {
+    background: transparent;
+  }
+  .admin-experience th {
+    background: var(--color-paper);
+    color: var(--color-brand);
+  }
+  .admin-experience th button {
+    color: inherit;
+  }
+  .admin-experience tbody tr:hover {
+    background: var(--booking-selected);
+  }
+  .admin-experience .management-list {
+    gap: 0;
+  }
+  .admin-experience .management-row {
+    background: transparent;
+    border: 0;
+    border-top: 1px solid var(--color-line);
+    border-radius: 0;
+    padding: 22px 0;
+  }
+  .admin-experience .management-row > div {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .admin-experience .staff-card {
+    padding: 22px 0;
+    border-top: 1px solid var(--color-line);
+  }
+  .admin-experience .panel {
+    padding: 0;
+  }
+  .admin-experience .login-shell {
+    max-width: 480px;
+    margin: 56px auto;
+    padding: 36px;
+    background: var(--booking-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 18px;
+  }
+  .admin-experience .login-icon {
+    background: var(--booking-selected);
+    color: var(--color-brand);
+  }
+  .admin-experience .login-shell .button {
+    min-height: 48px;
+    font-size: 16px;
+  }
+  .admin-experience .login-shell > .small {
+    font-size: 14px;
+  }
+  .admin-experience .modal::backdrop {
+    background: #15334dcc;
+  }
+  .admin-experience .icon-button {
+    color: var(--color-brand);
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-experience .admin-shell {
+    padding: 20px 20px calc(104px + env(safe-area-inset-bottom));
+  }
+  .admin-experience .admin-heading {
+    gap: 12px;
+  }
+  .admin-experience .admin-heading h1 {
+    font-size: 23px;
+  }
+  .admin-experience .admin-heading .muted {
+    font-size: 14px;
+  }
+  .admin-experience .admin-heading > .button {
+    padding-inline: 10px;
+    font-size: 12px;
+  }
+  .admin-experience .admin-tabs {
+    margin: 0;
+    gap: 4px;
+    background: var(--booking-surface);
+  }
+  .admin-experience .admin-tabs button {
+    padding: 12px 0;
+    min-height: 72px;
+    font-size: 12px;
+  }
+  .admin-experience .admin-tabs button.selected {
+    background: var(--booking-selected);
+  }
+  .admin-experience .admin-content {
+    padding: 16px;
+    margin-top: 20px;
+    border-radius: 14px;
+  }
+  .admin-experience .section-heading h2 {
+    font-size: 21px;
+  }
+  .admin-experience .date-navigation > .button {
+    padding-inline: 8px;
+  }
+  .admin-experience .date-navigation .compact-field {
+    font-size: 12px;
+  }
+  .admin-experience .segmented button {
+    padding-inline: 6px;
+    font-size: 13px;
+  }
+  .admin-experience .mobile-agenda .booking-card {
+    border-radius: 0;
+    padding: 18px 0;
+  }
+  .admin-experience .mobile-agenda .booking-card:hover {
+    background: var(--booking-selected);
+  }
+  .admin-experience .panel {
+    padding: 0;
+  }
+  .admin-experience .hours-day {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .admin-experience .hours-day > .checkbox-label {
+    padding-top: 0;
+  }
+  .admin-experience .login-shell {
+    margin: 32px 20px;
+    padding: 28px 24px;
+    max-width: none;
+  }
+  .admin-experience .login-shell h1 {
+    font-size: 26px;
+  }
+}
+@media (max-width: 380px) {
+  .admin-experience .admin-shell {
+    padding-inline: 13px;
+  }
+  .admin-experience .admin-heading h1 {
+    font-size: 20px;
+  }
+  .admin-experience .admin-content {
+    padding-inline: 12px;
+  }
+  .admin-experience .login-shell {
+    margin-inline: 13px;
+    padding: 24px 20px;
+  }
+}
